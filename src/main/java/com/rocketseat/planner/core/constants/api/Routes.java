@@ -11,4 +11,7 @@ public class Routes {
     public static final String TRIP = "/api/trips";
     public static final String CREATE_TRIP = "/create-trip";
 
+
+    public static final String PARTICIPANTS = "/api/participants";
+
 }
