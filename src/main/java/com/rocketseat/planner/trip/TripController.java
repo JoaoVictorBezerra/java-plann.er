@@ -2,6 +2,8 @@ package com.rocketseat.planner.trip;
 
 import com.rocketseat.planner.core.constants.api.Routes;
 import com.rocketseat.planner.participant.ParticipantsService;
+import com.rocketseat.planner.participant.dto.InviteParticipantRequest;
+import com.rocketseat.planner.participant.dto.InviteParticipantResponse;
 import com.rocketseat.planner.trip.dto.CreatedTripResponseDTO;
 import com.rocketseat.planner.trip.dto.TripRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ public class TripController {
 
         this.repository.save(newTrip);
 
-        this.participantsService.registerParticipantsOnEvent(body.emails_to_invite(), newTrip.getId());
+        this.participantsService.registerParticipantsOnEvent(body.emails_to_invite(), newTrip);
 
         return ResponseEntity.ok(new CreatedTripResponseDTO(newTrip.getId()));
     }
@@ -69,6 +71,26 @@ public class TripController {
 
             return ResponseEntity.ok(rawTrip);
         }
+        return ResponseEntity.notFound().build();
+    }
+
+
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<InviteParticipantResponse> inviteParticipant(@PathVariable("id") UUID id, @RequestBody InviteParticipantRequest body) {
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()) {
+            Trip rawTrip = trip.get();
+
+            InviteParticipantResponse a = this.participantsService.registerParticipant(body.email(), rawTrip);
+
+            if(rawTrip.isConfirmed()) {
+                this.participantsService.triggerConfirmationEmailToParticipant(body.email());
+            }
+
+            return ResponseEntity.ok(a);
+        }
+
         return ResponseEntity.notFound().build();
     }
 }
