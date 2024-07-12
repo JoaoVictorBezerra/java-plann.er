@@ -1,5 +1,8 @@
 package com.rocketseat.planner.trip;
 
+import com.rocketseat.planner.activities.ActivityService;
+import com.rocketseat.planner.activities.dto.CreateActivityRequest;
+import com.rocketseat.planner.activities.dto.CreateActivityResponse;
 import com.rocketseat.planner.core.constants.api.Routes;
 import com.rocketseat.planner.participant.ParticipantsService;
 import com.rocketseat.planner.participant.dto.InviteParticipantRequest;
@@ -24,6 +27,9 @@ public class TripController {
 
     @Autowired
     private TripRepository repository;
+
+    @Autowired
+    private ActivityService activityService;
 
     @PostMapping(Routes.CREATE_TRIP)
     public ResponseEntity<CreatedTripResponseDTO> createTrip(@RequestBody TripRequestDTO body) {
@@ -82,13 +88,28 @@ public class TripController {
         if(trip.isPresent()) {
             Trip rawTrip = trip.get();
 
-            InviteParticipantResponse a = this.participantsService.registerParticipant(body.email(), rawTrip);
+            InviteParticipantResponse response = this.participantsService.registerParticipant(body.email(), rawTrip);
 
             if(rawTrip.isConfirmed()) {
                 this.participantsService.triggerConfirmationEmailToParticipant(body.email());
             }
 
-            return ResponseEntity.ok(a);
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/activity")
+    public ResponseEntity<CreateActivityResponse> createActivity(@PathVariable("id") UUID id, @RequestBody CreateActivityRequest body) {
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()) {
+            Trip rawTrip = trip.get();
+
+            CreateActivityResponse response  = this.activityService.registerActivity(body.title(), body.occurs_at(), rawTrip);
+
+            return ResponseEntity.ok(response);
         }
 
         return ResponseEntity.notFound().build();
