@@ -1,12 +1,15 @@
 package com.rocketseat.planner.trip;
 
+import com.rocketseat.planner.activities.Activity;
 import com.rocketseat.planner.activities.ActivityService;
+import com.rocketseat.planner.activities.dto.ActivityResponse;
 import com.rocketseat.planner.activities.dto.CreateActivityRequest;
 import com.rocketseat.planner.activities.dto.CreateActivityResponse;
 import com.rocketseat.planner.core.constants.api.Routes;
 import com.rocketseat.planner.participant.ParticipantsService;
 import com.rocketseat.planner.participant.dto.InviteParticipantRequest;
 import com.rocketseat.planner.participant.dto.InviteParticipantResponse;
+import com.rocketseat.planner.participant.dto.ParticipantDataResponse;
 import com.rocketseat.planner.trip.dto.CreatedTripResponseDTO;
 import com.rocketseat.planner.trip.dto.TripRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -113,5 +117,12 @@ public class TripController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityResponse>> getAllActivitiesByTripId(@PathVariable("id") UUID id) {
+        List<ActivityResponse> participants = this.activityService.getAllActivitiesByTripId(id);
+
+        return ResponseEntity.ok(participants);
     }
 }
