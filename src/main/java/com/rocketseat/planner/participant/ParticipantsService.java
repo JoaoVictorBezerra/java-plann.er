@@ -1,6 +1,7 @@
 package com.rocketseat.planner.participant;
 
 import com.rocketseat.planner.participant.dto.InviteParticipantResponse;
+import com.rocketseat.planner.participant.dto.ParticipantDataResponse;
 import com.rocketseat.planner.trip.Trip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,5 +38,9 @@ public class ParticipantsService {
 
     public void triggerConfirmationEmailToParticipant(String email) {
 
+    }
+
+    public List<ParticipantDataResponse> getAllParticipantsByTripId(UUID id) {
+        return this.repository.findByTripId(id).stream().map(participant -> new ParticipantDataResponse(participant.getId(), participant.getEmail(), participant.isConfirmed())).toList();
     }
 }
