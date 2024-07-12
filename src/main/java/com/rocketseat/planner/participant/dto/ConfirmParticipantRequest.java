@@ -1,6 +1,6 @@
 package com.rocketseat.planner.participant.dto;
 
-public record ConfirmParticipantRequestDTO(
+public record ConfirmParticipantRequest(
       String name
 ) {
 }
